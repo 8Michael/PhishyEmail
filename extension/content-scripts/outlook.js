@@ -102,7 +102,23 @@
     };
   }
 
+  // Only analyze received mail -- checking phishing indicators on your own
+  // Sent/Drafts messages is pointless (you're the sender) and would also
+  // misfire lookalike-domain-style checks against your own address.
+  const EXCLUDED_PATH = /\/(sentitems|drafts|outbox)(\/|$)/i;
+
+  function isExcludedFolder() {
+    return EXCLUDED_PATH.test(location.pathname);
+  }
+
   const check = debounce(() => {
+    if (isExcludedFolder()) {
+      if (observedPane) removeBanner(observedPane);
+      observedPane = null;
+      lastFingerprint = null;
+      return;
+    }
+
     const pane = findReadingPane();
 
     if (!pane) {
@@ -120,6 +136,11 @@
     }
 
     const emailIn = extractEmail(pane);
+    // TEMP DEBUG: open DevTools console on the Outlook tab and look for
+    // this line to see exactly what got extracted. Remove once selectors
+    // are confirmed working against the live DOM.
+    console.debug("[phishy] extracted email:", emailIn);
+
     const fp = fingerprint(emailIn);
     if (fp === lastFingerprint) return;
     lastFingerprint = fp;

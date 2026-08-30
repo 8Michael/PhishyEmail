@@ -79,7 +79,23 @@
     };
   }
 
+  // Only analyze received mail -- checking phishing indicators on your own
+  // Sent/Drafts messages is pointless (you're the sender) and would also
+  // misfire lookalike-domain-style checks against your own address.
+  const EXCLUDED_HASH = /^#(sent|drafts)(\/|$)/i;
+
+  function isExcludedFolder() {
+    return EXCLUDED_HASH.test(location.hash);
+  }
+
   const check = debounce(() => {
+    if (isExcludedFolder()) {
+      if (lastContainer) removeBanner(lastContainer);
+      lastContainer = null;
+      lastFingerprint = null;
+      return;
+    }
+
     const messageEl = findOpenMessage();
     if (!messageEl) {
       if (lastContainer) removeBanner(lastContainer);

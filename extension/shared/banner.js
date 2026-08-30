@@ -18,6 +18,20 @@
     }
     .phishy-banner .phishy-title { font-weight: 600; margin-bottom: 4px; }
     .phishy-banner ul { margin: 4px 0 0; padding-left: 18px; }
+    .phishy-banner li { margin: 2px 0; }
+    .phishy-banner details { margin: 0; }
+    .phishy-banner summary { cursor: pointer; }
+    .phishy-banner summary::marker { color: inherit; }
+    .phishy-banner .phishy-url {
+      margin: 4px 0 4px 4px;
+      padding: 4px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 12px;
+      word-break: break-all;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 4px;
+      user-select: text;
+    }
     .phishy-tier-ok { background: #e6f4ea; border-color: #b7e1c2; color: #1e4620; }
     .phishy-tier-suspicious { background: #fff8e1; border-color: #f2d675; color: #6b5300; }
     .phishy-tier-phishing { background: #fdecea; border-color: #f3b4ac; color: #611a15; }
@@ -61,12 +75,25 @@
       const label = TIER_LABEL[verdict.tier] || verdict.tier;
       let html = `<div class="phishy-title">Phish Checker: ${escapeHtml(label)} (score ${verdict.score}/100)</div>`;
       if (verdict.findings && verdict.findings.length) {
-        html += "<ul>" + verdict.findings.map((f) => `<li>${escapeHtml(f.message)}</li>`).join("") + "</ul>";
+        html += "<ul>" + verdict.findings.map(renderFinding).join("") + "</ul>";
       }
       banner.innerHTML = html;
     }
 
     root.appendChild(banner);
+  }
+
+  // Findings tied to a specific link get a collapsible dropdown showing the
+  // raw URL as plain text (never a real <a href>) so a suspicious link can
+  // never be clicked from inside the banner itself.
+  function renderFinding(f) {
+    if (!f.url) {
+      return `<li>${escapeHtml(f.message)}</li>`;
+    }
+    return `<li><details>
+      <summary>${escapeHtml(f.message)}</summary>
+      <div class="phishy-url">Malicious URL: ${escapeHtml(f.url)}</div>
+    </details></li>`;
   }
 
   function removeBanner(container) {
