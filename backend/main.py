@@ -15,9 +15,9 @@ from analyzers.content import analyze_content
 # Once your extension is loaded, copy its ID from chrome://extensions
 # and set it here so only YOUR extension can call this server.
 ALLOWED_ORIGINS = [
-    "chrome-extension://REPLACE_WITH_YOUR_EXTENSION_ID",
+    "chrome-extension://gndnbfjkijceddlbkeocdhakmhekhajj",
 ]
-DEV_MODE = True  # set False once the extension ID above is filled in
+DEV_MODE = False
 
 app = FastAPI(title="Phish Checker (local)")
 

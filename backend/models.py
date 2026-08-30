@@ -21,6 +21,7 @@ class Finding(BaseModel):
     severity: str                  # "info" | "warn" | "high"
     points: int                    # contribution to the score
     message: str                   # human-readable explanation for the banner
+    url: str | None = None         # the specific link this finding is about, if any
 
 
 class Verdict(BaseModel):

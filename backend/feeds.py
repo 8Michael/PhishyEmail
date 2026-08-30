@@ -88,11 +88,32 @@ def _sync_urlhaus() -> None:
     print(f"[feeds] urlhaus: loaded {len(rows)} URLs")
 
 
+# Domains that host both legitimate and malicious content (free/shared
+# platforms attackers abuse for phishing pages). A domain-level feed hit
+# here is too broad -- one malicious Google Form poisons all of google.com,
+# flagging unrelated legit links (e.g. a Google Maps link in an order
+# confirmation email). Only trust an exact-URL match for these.
+SHARED_HOSTING_DOMAINS = {
+    "google.com", "googleusercontent.com", "drive.google.com",
+    "docs.google.com", "sites.google.com", "forms.gle",
+    "github.com", "github.io", "githubusercontent.com",
+    "amazonaws.com", "cloudfront.net", "herokuapp.com",
+    "sharepoint.com", "onedrive.live.com", "dropbox.com",
+    "firebaseapp.com", "web.app", "azurewebsites.net", "pages.dev",
+    "weebly.com", "wixsite.com", "blogspot.com",
+    "wsimg.com", "archive.org", "myqcloud.com", "doubleclick.net",
+}
+
+
 def is_flagged(url: str, domain: str) -> bool:
-    """Exact-URL hit or domain hit in the local feed DB."""
+    """Exact-URL hit always counts; domain-wide hit only for domains that
+    aren't shared hosting platforms with mixed legitimate/malicious content."""
     with _conn() as conn:
-        hit = conn.execute(
-            "SELECT 1 FROM bad_urls WHERE url = ? OR domain = ? LIMIT 1",
-            (url, domain),
-        ).fetchone()
+        if domain in SHARED_HOSTING_DOMAINS:
+            hit = conn.execute("SELECT 1 FROM bad_urls WHERE url = ? LIMIT 1", (url,)).fetchone()
+        else:
+            hit = conn.execute(
+                "SELECT 1 FROM bad_urls WHERE url = ? OR domain = ? LIMIT 1",
+                (url, domain),
+            ).fetchone()
     return hit is not None
