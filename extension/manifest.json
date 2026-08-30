@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "Phish Checker",
+  "version": "0.1.0",
+  "description": "Local, on-open phishing analysis for Gmail and Outlook web.",
+  "background": {
+    "service_worker": "background/service-worker.js"
+  },
+  "host_permissions": ["http://127.0.0.1:8765/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://mail.google.com/*"],
+      "js": ["shared/extract.js", "shared/banner.js", "content-scripts/gmail.js"],
+      "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://outlook.live.com/*",
+        "https://outlook.office.com/*",
+        "https://outlook.office365.com/*"
+      ],
+      "js": ["shared/extract.js", "shared/banner.js", "content-scripts/outlook.js"],
+      "run_at": "document_idle",
+      "match_origin_as_fallback": true
+    }
+  ]
+}
