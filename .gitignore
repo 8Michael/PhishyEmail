@@ -1,0 +1,11 @@
+.claude
+.env
+.venv
+
+# Python cache
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# local SQLite threat-feed store (synced data, not source)
+backend/feeds.db
