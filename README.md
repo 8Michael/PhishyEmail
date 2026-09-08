@@ -21,6 +21,10 @@ flowchart LR
     G -->|verdict JSON| H[banner.js<br/>inline banner, Shadow DOM]
 ```
 
+
+
+
+
 ## What it actually catches
 
 Digging into how real phishing emails are constructed turned into most of the learning here. A few of the checks the engine runs:
@@ -43,6 +47,8 @@ Every one of these is a `Finding` with a severity and a point value; `scoring.py
 - **Backend:** Python, FastAPI + Pydantic for the API contract, SQLite for the local threat-feed cache
 - **Fuzzy matching:** `tldextract` for registrable-domain parsing, `rapidfuzz` for lookalike-domain distance
 - **Threat feed:** [URLhaus](https://urlhaus.abuse.ch/) CSV feed over `httpx`, refreshed every 24 hours
+
+
 
 ## Project structure
 
@@ -68,6 +74,8 @@ extension/
   shared/extract.js              unwrapRedirect(), fingerprint(), debounce()
   shared/banner.js                renderBanner() / removeBanner()
 ```
+
+
 
 ## Getting started
 
@@ -128,6 +136,8 @@ Building the score-and-tier logic also made clear why phishing detection tools b
 - Grammar/spelling analysis is stubbed out in `analyzers/content.py` (deliberately low weight — modern phishing is often well-written)
 - Only URLhaus is wired up; there's a `url_cache` table already in `feeds.py` ready for a Safe Browsing–style API, and a noted spot for a PhishTank sync if you have a free API key
 - Brand/free-mail-provider lists are Python constants right now — moving them to a JSON config would make them easier to extend without touching code
+
+
 
 ## Disclaimer
 
